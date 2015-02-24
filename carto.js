@@ -37,11 +37,11 @@ var carto = d3.cartogram()
  });
 
 // Load and display streets
-d3.json("SF_Streets_topo.json", function(error, Streets) {
+d3.json("sf_geo.json", function(error, Streets) {
   svg.append("g")
       .attr("class", "SF_Streets")
     .selectAll("path")
-      .data(topojson.feature(Streets, Streets.objects.SF_Streets).features)
+      .data(topojson.feature(Streets, Streets.objects.sf_streets).features)
     .enter().append("path")
       .style("stroke", function(d){ return color(d.properties.street)})
       .style("stroke-width", "0.3")
