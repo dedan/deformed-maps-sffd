@@ -18,7 +18,7 @@
    *    return Math.random() * 100;
    *  });
    * d3.json("path/to/topology.json", function(topology) {
-   *  var features = cartogram(topology);
+   *  var features = cartogram(topology, topology.objects.OBJECTNAME.geometries);
    *  d3.select("svg").selectAll("path")
    *    .data(features)
    *    .enter()
@@ -201,7 +201,7 @@
         properties: properties.call(null, geom, topology),
         geometry: {
           type: geom.type,
-          coordinates: topojson.object(topology, geom).coordinates
+          coordinates: topojson.feature(topology, geom).geometry.coordinates
         }
       };
     };
@@ -329,7 +329,7 @@
     };
 
     return o.type === "GeometryCollection"
-        ? (o = Object.create(o), o.geometries = o.geometries.geometries.map(geometry), o)
+        ? (o = Object.create(o), o.geometries = o.geometries.map(geometry), o)
         : geometry(o);
   }
 
