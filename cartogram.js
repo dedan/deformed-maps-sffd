@@ -329,7 +329,7 @@
     };
 
     return o.type === "GeometryCollection"
-        ? (o = Object.create(o), o.geometries = o.geometries.map(geometry), o)
+        ? (o = Object.create(o), o.geometries = o.geometries.geometries.map(geometry), o)
         : geometry(o);
   }
 
