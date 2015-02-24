@@ -1,18 +1,29 @@
+# census tracts from https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2010-Census-Tracts-for-San-Francisco-Zipped/jyce-hqn2
+# https://mtaptich.github.io/OnRamp/d3_event_website.html
+
 GENERATED_FILES = \
-	mx.json
+  sf_geo.json
 
 .PHONY: all clean
 
 all: $(GENERATED_FILES)
 
 clean:
-	rm -rf -- $(GENERATED_FILES) build
+	rm -rf $(GENERATED_FILES) build
 
-build/mgm2010v5_0a.zip:
+build/bayarea_general.zip:
 	mkdir -p $(dir $@)
-	curl -o $@ 'http://mapserver.inegi.org.mx/MGN/mgm2010v5_0a.zip'
+	wget -O $@ 'https://data.sfgov.org/download/ye46-7n65/ZIP'
 
-build/mgm2010v5_0a.shp: build/mgm2010v5_0a.zip
+build/stclines_streets.zip:
+	mkdir -p $(dir $@)
+	wget -O $@ 'https://data.sfgov.org/download/wbm8-ratb/ZIP'
+
+build/tl_2010_06075_tract10.zip:
+	mkdir -p $(dir $@)
+	wget -O $@ 'https://data.sfgov.org/download/jyce-hqn2/ZIP'
+
+build/bayarea_general.shp: build/bayarea_general.zip
 	rm -rf -- $(basename $@)
 	mkdir -p $(basename $@)
 	unzip -d $(basename $@) $<
@@ -20,5 +31,65 @@ build/mgm2010v5_0a.shp: build/mgm2010v5_0a.zip
 	rm -rf -- $(basename $@)
 	touch $@
 
-mx.json: build/mgm2010v5_0a.shp
-	topojson --width=960 --margin=20 --simplify=1 -q 1e5 -o $@ -p name=NOM_MUN -p stat
+build/stclines_streets.shp: build/stclines_streets.zip
+	rm -rf -- $(basename $@)
+	mkdir -p $(basename $@)
+	unzip -d $(basename $@) $<
+	for file in `find $(basename $@) -type f`; do chmod 644 $$file; mv $$file $(basename $@).$${file##*.}; done
+	rm -rf -- $(basename $@)
+	touch $@
+
+build/tl_2010_06075_tract10.shp: build/tl_2010_06075_tract10.zip
+	rm -rf -- $(basename $@)
+	mkdir -p $(basename $@)
+	unzip -d $(basename $@) $<
+	for file in `find $(basename $@) -type f`; do chmod 644 $$file; mv $$file $(basename $@).$${file##*.}; done
+	rm -rf -- $(basename $@)
+	touch $@
+
+build/bayarea.json: build/bayarea_general.shp
+	ogr2ogr \
+	  -f GeoJSON \
+	  -t_srs 'EPSG:4326' \
+	  build/bayarea.json \
+	  build/bayarea_general.shp
+
+build/sf_streets.json: build/stclines_streets.shp
+	ogr2ogr \
+	  -f GeoJSON \
+	  -t_srs 'EPSG:4326' \
+	  -where "STREET IS NOT NULL" \
+	  build/sf_streets.json \
+	  build/stclines_streets.shp
+
+build/tracts.json: build/tl_2010_06075_tract10.shp
+	ogr2ogr \
+	  -f GeoJSON \
+	  -t_srs 'EPSG:4326' \
+	  -where "AWATER10 < 100000" \
+	  build/tracts.json \
+	  build/tl_2010_06075_tract10.shp
+
+
+build/bayarea_topo.json: build/bayarea.json
+	topojson \
+	  --id-property AREA_NAME \
+	  -o build/bayarea_topo.json  \
+	  build/bayarea.json
+
+
+build/sf_streets_topo.json: build/sf_streets.json
+	topojson \
+	 --id-property ZIP_CODE \
+	 -p street=ST_TYPE \
+	  -o build/sf_streets_topo.json  \
+	  build/sf_streets.json
+
+build/tracts_topo.json: build/tracts.json
+	topojson \
+	 --id-property GEOID10 \
+	  -o build/tracts_topo.json  \
+	  build/tracts.json
+
+sf_geo.json: build/bayarea_topo.json build/sf_streets_topo.json build/tracts_topo.json
+	topojson -o sf_geo.json -- build/bayarea_topo.json build/sf_streets_topo.json build/tracts_topo.json
