@@ -1,0 +1,29 @@
+
+.hood {
+  fill: #EEE;
+}
+
+.border {
+  fill: none;
+  stroke: #000;
+  stroke-dasharray: 6,2;
+  stroke-linejoin: round;
+}
+
+.SF {
+  fill: none;
+  fill-opacity: .99;
+  stroke: #a9a9a9;
+  stroke-width: 1px;
+}
+
+.Bay_and_Ocean{
+ fill: #b1dfda;
+}
+
+.SF_Streets{
+ fill: none;
+  fill-opacity: 1;
+  stroke: white;
+  stroke-width: 0.1px;
+}
