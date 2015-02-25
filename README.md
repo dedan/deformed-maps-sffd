@@ -9,3 +9,6 @@ I wanted to create a map that is deformed by the average response time of ambula
 * and then opoen the index.html
 
 ## inspirations and resources
+
+https://mtaptich.github.io/OnRamp/d3_event_website.html
+http://www.jeromecukier.net/blog/2014/10/27/new-personal-project-slopes-of-san-francisco/
