@@ -4,6 +4,8 @@ I wanted to create a map that is deformed by the average response time of ambula
 
 ## how to get it running
 
-run `make all` to download all the data and then opoen the index.html
+* run `make all` to download all the data
+* start a webserver, e.g.: `python -m SimpleHTTPServer 8000`
+* and then opoen the index.html
 
-* inspirations and resources
+## inspirations and resources
